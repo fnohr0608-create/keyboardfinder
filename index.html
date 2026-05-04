@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KeyFinder – Deine perfekte Tastatur</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: #2a2a35;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #6b6b80;
+    --card-hover: #22222c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 60px 0 40px;
+    text-align: center;
+  }
+
+  .logo-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Finder Form */
+  .finder {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 48px;
+    margin: 48px 0;
+  }
+
+  .step {
+    margin-bottom: 40px;
+  }
+
+  .step-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  /* Option Grid */
+  .options {
+    display: grid;
+    gap: 10px;
+  }
+
+  .options.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .options.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .option-btn:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+  }
+
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(232,255,71,0.07);
+    color: var(--accent);
+  }
+
+  .option-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .option-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Price Range */
+  .price-slider-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .price-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .price-display span {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 0;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .price-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    color: #0d0d0f;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border-radius: 2px;
+    margin-top: 8px;
+  }
+
+  .submit-btn:hover {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+
+  .submit-btn:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Results */
+  #results {
+    display: none;
+    margin-bottom: 80px;
+  }
+
+  .results-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .results-title {
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .results-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .keyboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .keyboard-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 24px;
+    transition: all 0.2s ease;
+    animation: fadeUp 0.4s ease forwards;
+    opacity: 0;
+    text-decoration: none;
+    display: block;
+    color: var(--text);
+  }
+
+  .keyboard-card:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .card-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 1px;
+    text-transform: uppercase;
+  }
+
+  .tag.highlight {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  .card-price {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .card-link-icon {
+    color: var(--accent);
+    font-size: 18px;
+    transition: transform 0.15s;
+  }
+
+  .keyboard-card:hover .card-link-icon {
+    transform: translate(3px, -3px);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-size: 16px;
+    border: 1px dashed var(--border);
+  }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  @media (max-width: 600px) {
+    .finder { padding: 28px 20px; }
+    .options.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    .options.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo-tag">KeyFinder v1.0</div>
+    <h1>Find your<br><span>perfect keyboard.</span></h1>
+    <p class="subtitle">Beantworte drei kurze Fragen – wir zeigen dir die besten Tastaturen für deinen Bedarf.</p>
+  </header>
+
+  <div class="finder" id="finder">
+    <!-- Step 1: Nutzungsart -->
+    <div class="step">
+      <div class="step-label">Schritt 01</div>
+      <div class="step-title">Wofür nutzt du die Tastatur hauptsächlich?</div>
+      <div class="options cols-4" id="usage-options">
+        <button class="option-btn" data-value="programming" onclick="selectOption(this,'usage')">
+          <div class="option-icon">💻</div>
+          <div class="option-name">Programmieren</div>
+        </button>
+        <button class="option-btn" data-value="gaming" onclick="selectOption(this,'usage')">
+          <div class="option-icon">🎮</div>
+          <div class="option-name">Gaming</div>
+        </button>
+        <button class="option-btn" data-value="business" onclick="selectOption(this,'usage')">
+          <div class="option-icon">💼</div>
+          <div class="option-name">Business</div>
+        </button>
+        <button class="option-btn" data-value="everyday" onclick="selectOption(this,'usage')">
+          <div class="option-icon">🏠</div>
+          <div class="option-name">Alltag</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Budget -->
+    <div class="step">
+      <div class="step-label">Schritt 02</div>
+      <div class="step-title">Wie hoch ist dein Budget?</div>
+      <div class="price-slider-wrap">
+        <div class="price-display" id="price-display">75 € <span>Maximalpreis</span></div>
+        <input type="range" id="price-slider" min="25" max="300" step="25" value="75"
+               oninput="updatePrice(this.value)">
+        <div class="price-labels">
+          <span>25 €</span><span>75 €</span><span>125 €</span><span>175 €</span><span>225 €</span><span>300 €+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Haptik -->
+    <div class="step" style="margin-bottom:0">
+      <div class="step-label">Schritt 03</div>
+      <div class="step-title">Welches Tastengefühl bevorzugst du?</div>
+      <div class="options cols-3" id="haptic-options">
+        <button class="option-btn" data-value="loud" onclick="selectOption(this,'haptic')">
+          <div class="option-icon">🔊</div>
+          <div class="option-name">Laut & klickend</div>
+        </button>
+        <button class="option-btn" data-value="soft" onclick="selectOption(this,'haptic')">
+          <div class="option-icon">🟣</div>
+          <div class="option-name">Weich & gedämpft</div>
+        </button>
+        <button class="option-btn" data-value="silent" onclick="selectOption(this,'haptic')">
+          <div class="option-icon">🔇</div>
+          <div class="option-name">Sanft & leise</div>
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-top:32px">
+      <button class="submit-btn" id="find-btn" onclick="findKeyboards()" disabled>
+        Tastatur finden →
+      </button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="results-header">
+      <div class="results-title">Deine Empfehlungen</div>
+      <div class="results-count" id="results-count"></div>
+      <button class="reset-btn" onclick="resetFinder()" style="margin-left:auto">↩ Neue Suche</button>
+    </div>
+    <div class="keyboard-grid" id="keyboard-grid"></div>
+  </div>
+</div>
+
+<script>
+// ─── State ─────────────────────────────────────────────────────────────────
+const state = { usage: null, price: 75, haptic: null };
+
+// ─── Keyboard Database (~40 popular keyboards) ─────────────────────────────
+const keyboards = [
+  // ── PROGRAMMING ──
+  { name: "Das Keyboard 4 Professional", brand: "Das Keyboard",
+    usage: ["programming","business"], haptic: ["loud"], price: 169,
+    tags: ["MX Blue","TKL","DE-Layout"],
+    url: "https://www.daskeyboard.com/daskeyboard-4-professional/" },
+
+  { name: "Keychron Q1 Pro", brand: "Keychron",
+    usage: ["programming","business"], haptic: ["soft","loud"], price: 189,
+    tags: ["75%","Wireless","Gasket"],
+    url: "https://www.keychron.com/products/keychron-q1-pro-qmk-via-wireless-custom-mechanical-keyboard" },
+
+  { name: "Keychron K8 Pro", brand: "Keychron",
+    usage: ["programming","everyday"], haptic: ["soft","loud","silent"], price: 99,
+    tags: ["TKL","Wireless","Hot-Swap"],
+    url: "https://www.keychron.com/products/keychron-k8-pro-qmk-via-wireless-mechanical-keyboard" },
+
+  { name: "HHKB Professional Hybrid Type-S", brand: "HHKB",
+    usage: ["programming"], haptic: ["silent"], price: 299,
+    tags: ["Topre","60%","Leise","Premium"],
+    url: "https://hhkeyboard.us/hhkb/pro-hybrid-type-s" },
+
+  { name: "Varmilo VA87M", brand: "Varmilo",
+    usage: ["programming","business"], haptic: ["soft","silent"], price: 139,
+    tags: ["TKL","Cherry MX Red"],
+    url: "https://en.varmilo.com/keyboardproscenium/subject?subjectid=287" },
+
+  { name: "Leopold FC750R", brand: "Leopold",
+    usage: ["programming","business"], haptic: ["soft","silent"], price: 125,
+    tags: ["TKL","PBT Keycaps","Qualität"],
+    url: "https://www.leopold.co.kr/Shop/Item.php?ItId=1649390218" },
+
+  { name: "Ducky One 3", brand: "Ducky",
+    usage: ["programming","everyday"], haptic: ["loud","soft","silent"], price: 119,
+    tags: ["TKL","Hot-Swap","RGB"],
+    url: "https://www.duckychannel.com.tw/en/Ducky-One3" },
+
+  { name: "Keychron C3 Pro", brand: "Keychron",
+    usage: ["programming","everyday"], haptic: ["soft","loud"], price: 39,
+    tags: ["TKL","Kabelgebunden","Einsteiger"],
+    url: "https://www.keychron.com/products/keychron-c3-pro-wired-mechanical-keyboard" },
+
+  // ── GAMING ──
+  { name: "Razer BlackWidow V4 Pro", brand: "Razer",
+    usage: ["gaming"], haptic: ["loud"], price: 229,
+    tags: ["Razer Green","RGB","Wireless"],
+    url: "https://www.razer.com/gaming-keyboards/razer-blackwidow-v4-pro" },
+
+  { name: "Corsair K100 RGB", brand: "Corsair",
+    usage: ["gaming"], haptic: ["soft"], price: 199,
+    tags: ["OPX Switch","Full-Size","iCUE"],
+    url: "https://www.corsair.com/eu/de/p/keyboards/ch-912a01a-de/k100-rgb-mechanical-gaming-keyboard-corsair-opx-rgb-switch-de-ch-912a01a-de" },
+
+  { name: "SteelSeries Apex Pro TKL", brand: "SteelSeries",
+    usage: ["gaming"], haptic: ["soft","silent"], price: 189,
+    tags: ["OmniPoint","TKL","Adjustable"],
+    url: "https://steelseries.com/gaming-keyboards/apex-pro-tkl" },
+
+  { name: "Logitech G Pro X TKL", brand: "Logitech",
+    usage: ["gaming"], haptic: ["loud","soft","silent"], price: 129,
+    tags: ["Hot-Swap","TKL","Esports"],
+    url: "https://www.logitechg.com/de-de/products/gaming-keyboards/pro-x-keyboard.html" },
+
+  { name: "HyperX Alloy Origins 65", brand: "HyperX",
+    usage: ["gaming","everyday"], haptic: ["soft"], price: 89,
+    tags: ["65%","HyperX Red","RGB"],
+    url: "https://www.hyperx.com/de/gaming-keyboards/alloy-origins-65" },
+
+  { name: "Razer Huntsman Mini", brand: "Razer",
+    usage: ["gaming"], haptic: ["loud","silent"], price: 109,
+    tags: ["60%","Opto-Switch","Kompakt"],
+    url: "https://www.razer.com/gaming-keyboards/razer-huntsman-mini" },
+
+  { name: "ASUS ROG Strix Scope RX TKL", brand: "ASUS ROG",
+    usage: ["gaming"], haptic: ["soft"], price: 119,
+    tags: ["ROG RX Red","TKL","Wireless"],
+    url: "https://rog.asus.com/keyboards/keyboards/tkl/rog-strix-scope-rxtkl-wireless-deluxe-model/" },
+
+  { name: "Corsair K70 RGB MK.2", brand: "Corsair",
+    usage: ["gaming"], haptic: ["loud","soft","silent"], price: 139,
+    tags: ["Cherry MX","Full-Size","Aluminiumrahmen"],
+    url: "https://www.corsair.com/eu/de/p/keyboards/ch-9109010-de/k70-rgb-mk-2-mechanical-gaming-keyboard-cherry-mx-red-de-ch-9109010-de" },
+
+  { name: "Ducky One 3 Mini", brand: "Ducky",
+    usage: ["gaming","everyday"], haptic: ["loud","soft","silent"], price: 109,
+    tags: ["60%","Hot-Swap","RGB"],
+    url: "https://www.duckychannel.com.tw/en/Ducky-One3-Mini" },
+
+  { name: "Wooting 60HE", brand: "Wooting",
+    usage: ["gaming"], haptic: ["soft"], price: 175,
+    tags: ["60%","Analog","Rapid Trigger"],
+    url: "https://wooting.io/wooting-60he" },
+
+  { name: "SteelSeries Apex 3 TKL", brand: "SteelSeries",
+    usage: ["gaming","everyday"], haptic: ["silent"], price: 49,
+    tags: ["TKL","Membran","Leise","Einsteiger"],
+    url: "https://steelseries.com/gaming-keyboards/apex-3-tkl" },
+
+  // ── BUSINESS ──
+  { name: "Logitech MX Keys", brand: "Logitech",
+    usage: ["business","everyday"], haptic: ["silent","soft"], price: 119,
+    tags: ["Wireless","Low Profile","Multi-Device"],
+    url: "https://www.logitech.com/de-de/products/keyboards/mx-keys-wireless-keyboard.920-009418.html" },
+
+  { name: "Microsoft Sculpt Ergonomic", brand: "Microsoft",
+    usage: ["business"], haptic: ["silent"], price: 99,
+    tags: ["Ergonomisch","Wireless","Natürlich"],
+    url: "https://www.microsoft.com/de-de/d/microsoft-sculpt-ergonomic-desktop/8xk02kf9gbh3" },
+
+  { name: "Logitech K860 Ergo", brand: "Logitech",
+    usage: ["business"], haptic: ["silent"], price: 129,
+    tags: ["Ergonomisch","Wireless","Split"],
+    url: "https://www.logitech.com/de-de/products/keyboards/k860-split-ergonomic.html" },
+
+  { name: "Cherry KC 6000 Slim", brand: "Cherry",
+    usage: ["business","everyday"], haptic: ["silent"], price: 49,
+    tags: ["Slim","USB","Leise"],
+    url: "https://www.cherry-world.com/kc-6000-slim.html" },
+
+  { name: "Apple Magic Keyboard", brand: "Apple",
+    usage: ["business","everyday"], haptic: ["silent"], price: 99,
+    tags: ["Wireless","Mac","Touch ID"],
+    url: "https://www.apple.com/de/shop/buy-mac/accessories/keyboards" },
+
+  { name: "Keychron K4 Pro", brand: "Keychron",
+    usage: ["business","programming"], haptic: ["soft","silent"], price: 109,
+    tags: ["96%","Wireless","Numpad"],
+    url: "https://www.keychron.com/products/keychron-k4-pro-qmk-via-wireless-mechanical-keyboard" },
+
+  { name: "Logitech MX Keys Mini", brand: "Logitech",
+    usage: ["business","everyday"], haptic: ["silent"], price: 99,
+    tags: ["TKL","Wireless","Slim"],
+    url: "https://www.logitech.com/de-de/products/keyboards/mx-keys-mini.920-010499.html" },
+
+  { name: "Dell Pro Wireless KB900", brand: "Dell",
+    usage: ["business"], haptic: ["silent"], price: 149,
+    tags: ["Wireless","Ergonomisch","USB-C"],
+    url: "https://www.dell.com/de-de/shop/dell-pro-wireless-keyboard-and-mouse-km7321w/apd/580-akfz/tastatur-maus-combos" },
+
+  { name: "Perixx PERIBOARD-335", brand: "Perixx",
+    usage: ["business"], haptic: ["silent"], price: 59,
+    tags: ["Mechanical","Slim","Leise"],
+    url: "https://perixx.com/products/periboard-335" },
+
+  // ── ALLTAG / EVERYDAY ──
+  { name: "Logitech K380", brand: "Logitech",
+    usage: ["everyday"], haptic: ["silent","soft"], price: 39,
+    tags: ["Wireless","Kompakt","Multi-Device"],
+    url: "https://www.logitech.com/de-de/products/keyboards/k380-multi-device.html" },
+
+  { name: "Keychron K2 V2", brand: "Keychron",
+    usage: ["everyday","programming"], haptic: ["loud","soft","silent"], price: 89,
+    tags: ["75%","Wireless","Einsteiger Mech"],
+    url: "https://www.keychron.com/products/keychron-k2-hot-swappable-wireless-mechanical-keyboard" },
+
+  { name: "Royal Kludge RK61", brand: "Royal Kludge",
+    usage: ["everyday","gaming"], haptic: ["loud","soft","silent"], price: 49,
+    tags: ["60%","Wireless","Budget Mech"],
+    url: "https://rkgamingstore.com/products/rk61-wireless-mechanical-keyboard" },
+
+  { name: "Cherry MX 3.0S", brand: "Cherry",
+    usage: ["everyday","business"], haptic: ["loud","soft","silent"], price: 79,
+    tags: ["Full-Size","Cherry MX","Solide"],
+    url: "https://www.cherry-world.com/mx-3.0s-keyboard.html" },
+
+  { name: "Razer DeathStalker V2 Pro", brand: "Razer",
+    usage: ["everyday","gaming"], haptic: ["silent"], price: 179,
+    tags: ["Low Profile","Wireless","Silent"],
+    url: "https://www.razer.com/gaming-keyboards/razer-deathstalker-v2-pro" },
+
+  { name: "Logitech G715 TKL", brand: "Logitech",
+    usage: ["everyday","gaming"], haptic: ["silent"], price: 149,
+    tags: ["TKL","Wireless","Tactile"],
+    url: "https://www.logitechg.com/de-de/products/gaming-keyboards/g715-wireless-gaming-keyboard.html" },
+
+  { name: "Nuphy Air75 V2", brand: "Nuphy",
+    usage: ["everyday","business"], haptic: ["silent","soft"], price: 109,
+    tags: ["75%","Low Profile","Wireless"],
+    url: "https://nuphy.com/products/air75-v2" },
+
+  { name: "Epomaker TH80 Pro", brand: "Epomaker",
+    usage: ["everyday","programming"], haptic: ["soft","silent"], price: 79,
+    tags: ["75%","Wireless","Gasket","Budget"],
+    url: "https://epomaker.com/products/epomaker-th80-pro" },
+
+  { name: "Filco Majestouch-2", brand: "Filco",
+    usage: ["everyday","business","programming"], haptic: ["loud","soft"], price: 149,
+    tags: ["TKL","Cherry MX","Japanisch","Langlebig"],
+    url: "https://www.diatec.co.jp/en/det.php?prod_c=1471" },
+
+  { name: "Redragon K552 Kumara", brand: "Redragon",
+    usage: ["everyday","gaming"], haptic: ["loud"], price: 29,
+    tags: ["TKL","Budget","Einsteiger","RGB"],
+    url: "https://www.redragonzone.com/products/redragon-k552-mechanical-gaming-keyboard" },
+
+  { name: "Matias Quiet Pro", brand: "Matias",
+    usage: ["everyday","programming"], haptic: ["silent"], price: 139,
+    tags: ["Full-Size","Alps","Sehr Leise"],
+    url: "https://matias.ca/quietpro/pc/" },
+
+  { name: "Anne Pro 2", brand: "Obins",
+    usage: ["everyday","programming"], haptic: ["loud","soft","silent"], price: 79,
+    tags: ["60%","Wireless","RGB","Kompakt"],
+    url: "https://www.annepro.net/products/anne-pro-2" },
+];
+
+// ─── Interactions ───────────────────────────────────────────────────────────
+function selectOption(btn, group) {
+  document.querySelectorAll(`#${group}-options .option-btn`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state[group] = btn.dataset.value;
+  checkReady();
+}
+
+function updatePrice(val) {
+  state.price = parseInt(val);
+  const label = val >= 300 ? '300+ €' : val + ' €';
+  document.getElementById('price-display').innerHTML = label + ' <span>Maximalpreis</span>';
+  checkReady();
+}
+
+function checkReady() {
+  document.getElementById('find-btn').disabled = !(state.usage && state.haptic);
+}
+
+function findKeyboards() {
+  const maxPrice = state.price >= 300 ? 9999 : state.price;
+
+  const matches = keyboards.filter(kb => {
+    const usageMatch = kb.usage.includes(state.usage);
+    const hapticMatch = kb.haptic.includes(state.haptic);
+    const priceMatch = kb.price <= maxPrice;
+    return usageMatch && hapticMatch && priceMatch;
+  });
+
+  // Fallback: loosen haptic if too few results
+  let results = matches;
+  if (results.length < 3) {
+    results = keyboards.filter(kb =>
+      kb.usage.includes(state.usage) && kb.price <= maxPrice
+    );
+  }
+
+  renderResults(results);
+}
+
+function renderResults(results) {
+  const grid = document.getElementById('keyboard-grid');
+  const count = document.getElementById('results-count');
+
+  if (results.length === 0) {
+    grid.innerHTML = `<div class="no-results" style="grid-column:1/-1">
+      Keine Tastaturen gefunden. Erhöhe bitte dein Budget oder ändere die Filterauswahl.
+    </div>`;
+  } else {
+    count.textContent = results.length + ' Tastaturen gefunden';
+    grid.innerHTML = results.map((kb, i) => `
+      <a class="keyboard-card" href="${kb.url}" target="_blank" rel="noopener"
+         style="animation-delay:${i * 60}ms">
+        <div class="card-brand">${kb.brand}</div>
+        <div class="card-name">${kb.name}</div>
+        <div class="card-tags">
+          ${kb.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+        <div class="card-footer">
+          <div class="card-price">ca. ${kb.price} €</div>
+          <div class="card-link-icon">↗</div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  document.getElementById('finder').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetFinder() {
+  state.usage = null;
+  state.haptic = null;
+  state.price = 75;
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('price-slider').value = 75;
+  document.getElementById('price-display').innerHTML = '75 € <span>Maximalpreis</span>';
+  document.getElementById('find-btn').disabled = true;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('finder').style.display = 'block';
+}
+</script>
+</body>
+</html>
